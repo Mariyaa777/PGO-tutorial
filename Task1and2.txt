@@ -1,0 +1,87 @@
+import java.util.Scanner;
+import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.*;
+
+class HelloWorld {
+    private static final double BASE_PRICE = 40.0;
+    
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("Wprowadz miasto");
+        String city = scanner.nextLine();
+        System.out.println("Wprowadz wiek");
+        int age = scanner.nextInt();
+        scanner.nextLine(); 
+        System.out.println("Wprowadz dzien tygodnia");
+        String dayOfWeek = scanner.nextLine();
+        scanner.close();
+        
+        double price = caculatePrice(age, city, dayOfWeek);
+        displayTicketInformation(age, city, dayOfWeek, price);
+    }
+    
+    public static double caculatePrice(int age, String city, String dayOfWeek){
+        if(dayOfWeek.equalsIgnoreCase("Czwartek") || age < 10) return 0;
+        double price = BASE_PRICE;
+        if(age  >= 10 && age <= 18) price *= 0.5;
+        if(city.equalsIgnoreCase("Warszawa")) price *= 0.9;
+        return price;
+    }
+    
+    public static void displayTicketInformation(int age, String city, String dayOfWeek, double price){
+        System.out.print("Data: ");
+        System.out.print(city + ", ");
+        System.out.print(age + " years old, ");
+        System.out.print((dayOfWeek.equals("Czwartek") ? "weekend" : "weekday") + " ");
+        System.out.println("Ticket price: " + price + " ");
+        double discount = getPercentageDiscount(price);
+        System.out.print("Discount: " + discount + "%");
+    }
+    
+    public static double getPercentageDiscount(double price){
+        return Math.round(((BASE_PRICE - price) / BASE_PRICE) * 100.0);
+    }
+    
+    @Test
+    void TestCaculatePrice_WithDiscountForAgeUnder18_ReturnsCorrectPrice() {
+        double expectedPrice = 20.0;
+        double actualPrice = HelloWorld.caculatePrice(15, "Warszawa", "Wtorek");
+        assertEquals(expectedPrice, actualPrice);
+    }
+    
+    @Test
+    void TestCaculatePrice_WithDiscountForAgeUnder10_ReturnsCorrectPrice() {
+        double expectedPrice = 0;
+        double actualPrice = HelloWorld.caculatePrice(9, "Warszawa", "Wtorek");
+        assertEquals(expectedPrice, actualPrice);
+    }
+
+    @Test
+    void TestCaculatePrice_WithDiscountForWarszawaCity_ReturnsCorrectPrice() {
+        double expectedPrice = 36.0;
+        double actualPrice = HelloWorld.caculatePrice(25, "Warszawa", "Wtorek");
+        assertEquals(expectedPrice, actualPrice);
+    }
+
+    @Test
+    void TestCaculatePrice_WithoutDiscount_ReturnsBasePrice() {
+        double expectedPrice = 40.0;
+        double actualPrice = HelloWorld.caculatePrice(25, "Krakow", "Poniedzialek");
+        assertEquals(expectedPrice, actualPrice);
+    }
+
+    @Test
+    void TestCaculatePrice_WithDiscountForCzwartekDayOfWeek_ReturnsZero() {
+        double expectedPrice = 0; 
+        double actualPrice = HelloWorld.caculatePrice(25, "Warszawa", "Czwartek");
+        assertEquals(expectedPrice, actualPrice);
+    }
+
+    @Test
+    void TestGetPercentageDiscount_ReturnsCorrectDiscount() {
+        double price = 32.0;
+        double expectedDiscount = 20.0;
+        double actualDiscount = HelloWorld.getPercentageDiscount(price);
+        assertEquals(expectedDiscount, actualDiscount);
+    }
+}
